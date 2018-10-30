@@ -47,6 +47,9 @@ namespace Nip.Blog.Services.Posts.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            } else
+            {
+                app.UseExceptionHandler("/api/v1/Error");
             }
 
             app.UseMvc();
