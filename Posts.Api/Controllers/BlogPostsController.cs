@@ -20,6 +20,8 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
 
         // GET api/blogposts
         [HttpGet]
+        [ProducesResponseType(200, Type = typeof(List<BlogPost>))]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> Get()
         {
             return Ok(await _postsDbContext.BlogPosts.ToAsyncEnumerable().ToList());
@@ -27,6 +29,9 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
 
         // GET api/blogposts/5
         [HttpGet("{id}", Name = "GetBlogPost")]
+        [ProducesResponseType(200, Type = typeof(BlogPost))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Get(long id)
         {
             var item = await _postsDbContext.BlogPosts.FindAsync(id);
@@ -42,6 +47,8 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
 
         // POST api/blogposts
         [HttpPost]
+        [ProducesResponseType(201, Type = typeof(BlogPost))]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> Post([FromBody] BlogPost post)
         {
             await _postsDbContext.BlogPosts.AddAsync(post);
@@ -52,6 +59,9 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
 
         // PUT api/blogposts/5
         [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Put(long id, [FromBody] BlogPost updatedPost)
         {
             var post = await _postsDbContext.BlogPosts.FindAsync(id);
@@ -72,6 +82,9 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
 
         // DELETE api/blogposts/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(long id)
         {
             var post = await _postsDbContext.BlogPosts.FindAsync(id);

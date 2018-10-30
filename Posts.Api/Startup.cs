@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nip.Blog.Services.Posts.API.Data;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Nip.Blog.Services.Posts.Api
 {
@@ -27,6 +28,17 @@ namespace Nip.Blog.Services.Posts.Api
         {
             services.AddMvc();
             services.AddDbContext<BlogPostContext>(opt => opt.UseInMemoryDatabase("BlogPosts"));
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info {
+                    Title = "Blog Posts API",
+                    Version = "v1",
+                    Description = "Blog Posts API for 2018/19 NiPwPP class at Silesian University of Technology.",
+                    Contact = new Contact {
+                        Url = "https://github.com/olafkry208/Nip.Blog"
+                    }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,6 +50,11 @@ namespace Nip.Blog.Services.Posts.Api
             }
 
             app.UseMvc();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blog Posts API v1");
+            });
         }
     }
 }
