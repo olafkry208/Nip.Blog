@@ -16,9 +16,12 @@ namespace Nip.Blog.Services.Posts.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly ILogger<Startup> _logger;
+
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
+            _logger = logger;
         }
 
         public IConfiguration Configuration { get; }
@@ -26,6 +29,8 @@ namespace Nip.Blog.Services.Posts.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            _logger.LogInformation("Configuring services");
+
             services.AddMvc();
             services.AddDbContext<BlogPostContext>(opt => opt.UseInMemoryDatabase("BlogPosts"));
             services.AddSwaggerGen(c =>
@@ -46,9 +51,11 @@ namespace Nip.Blog.Services.Posts.Api
         {
             if (env.IsDevelopment())
             {
+                _logger.LogInformation("App is in development environment");
                 app.UseDeveloperExceptionPage();
             } else
             {
+                _logger.LogInformation("App is in production environment");
                 app.UseExceptionHandler("/api/v1/Error");
             }
 
