@@ -12,6 +12,7 @@ using Nip.Blog.Services.Posts.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Swagger;
 using Nip.Blog.Services.Posts.API.Models;
+using Nip.Blog.Services.Posts.Api.Repositories;
 
 namespace Nip.Blog.Services.Posts.Api
 {
@@ -52,6 +53,7 @@ namespace Nip.Blog.Services.Posts.Api
                     break;
             }
 
+            services.AddScoped<IBlogPostRepository, BlogPostRepository>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info {
