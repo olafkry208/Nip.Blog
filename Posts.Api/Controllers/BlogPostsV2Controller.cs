@@ -23,15 +23,26 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
             _postRepository = postRepository;
         }
 
-        // GET api/blogposts
+        // GET api/blogposts[?pageIndex=3&pageSize=10]
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(List<BlogPost>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<BlogPost>))]
+        [ProducesResponseType(200, Type = typeof(PaginatedItems<BlogPost>))]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery]int pageIndex = -1, [FromQuery]int pageSize = 5)
         {
             _logger.LogInformation("Retrieving all posts");
 
-            return Ok(await _postRepository.GetAllAsync().ToList());
+            if (pageIndex < 0)
+            {
+                var posts = await _postRepository.GetAllAsync().ToList();
+                return Ok(posts);
+            } else
+            {
+                var posts = await _postRepository.GetAllPagedAsync(pageIndex, pageSize);
+                var isLastPage = (pageIndex + 1) * pageSize >= posts.TotalItems;
+                posts.NextPage = (!isLastPage ? Url.Link(null, new { pageIndex = pageIndex + 1, pageSize = pageSize }) : null);
+                return Ok(posts);
+            }
         }
 
         // GET api/blogposts/5

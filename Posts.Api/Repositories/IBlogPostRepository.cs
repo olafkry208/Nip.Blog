@@ -9,6 +9,7 @@ namespace Nip.Blog.Services.Posts.Api.Repositories
     public interface IBlogPostRepository
     {
         IAsyncEnumerable<BlogPost> GetAllAsync();
+        Task<PaginatedItems<BlogPost>> GetAllPagedAsync(int pageIndex, int pageSize);
         Task<BlogPost> GetAsync(long id);
         Task AddAsync(BlogPost post);
         Task UpdateAsync(BlogPost post);
