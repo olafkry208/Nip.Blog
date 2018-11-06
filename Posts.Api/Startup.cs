@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Swagger;
 using Nip.Blog.Services.Posts.API.Models;
 using Nip.Blog.Services.Posts.Api.Repositories;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace Nip.Blog.Services.Posts.Api
 {
@@ -54,21 +55,30 @@ namespace Nip.Blog.Services.Posts.Api
             }
 
             services.AddScoped<IBlogPostRepository, BlogPostRepository>();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info {
-                    Title = "Blog Posts API",
-                    Version = "v1",
-                    Description = "Blog Posts API for 2018/19 NiPwPP class at Silesian University of Technology.",
-                    Contact = new Contact {
-                        Url = "https://github.com/olafkry208/Nip.Blog"
-                    }
-                });
+            services.AddMvcCore().AddVersionedApiExplorer(
+                options => {
+                    options.GroupNameFormat = "'v'VVV";
+                    options.SubstituteApiVersionInUrl = true;
+                }
+            );
+            services.AddApiVersioning(options => options.ReportApiVersions = true);
+            services.AddSwaggerGen(options => {
+                var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
+                foreach (var description in provider.ApiVersionDescriptions) {
+                    options.SwaggerDoc(description.GroupName, new Info {
+                        Title = "Blog Posts API",
+                        Version = description.ApiVersion.ToString(),
+                        Description = "Blog Posts API for 2018/19 NiPwPP class at Silesian University of Technology.",
+                        Contact = new Contact {
+                            Url = "https://github.com/olafkry208/Nip.Blog"
+                        }
+                    });
+                }
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, BlogPostContext context)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, BlogPostContext context, IApiVersionDescriptionProvider apiVersionDescriptionProvider)
         {
             if (env.IsDevelopment())
             {
@@ -97,7 +107,11 @@ namespace Nip.Blog.Services.Posts.Api
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blog Posts API v1");
+                foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+                {
+                    c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                }
+                c.RoutePrefix = string.Empty; // serve the Swagger UI at the app's root
             });
         }
     }

@@ -10,14 +10,14 @@ using Nip.Blog.Services.Posts.Api.Repositories;
 
 namespace Nip.Blog.Services.Posts.Api.Controllers
 {
-    [ApiVersion("1")]
-    [Route("api/v{version:apiVersion}/[controller]")]
-    public class BlogPostsController : Controller
+    [ApiVersion("2")]
+    [Route("api/v{version:apiVersion}/BlogPosts")]
+    public class BlogPostsV2Controller : Controller
     {
         private readonly ILogger<BlogPostsController> _logger;
         private readonly IBlogPostRepository _postRepository;
 
-        public BlogPostsController(ILogger<BlogPostsController> logger, IBlogPostRepository postRepository)
+        public BlogPostsV2Controller(ILogger<BlogPostsController> logger, IBlogPostRepository postRepository)
         {
             _logger = logger;
             _postRepository = postRepository;
@@ -35,7 +35,7 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
         }
 
         // GET api/blogposts/5
-        [HttpGet("{id}", Name = "GetBlogPost")]
+        [HttpGet("{id}", Name = "GetBlogPostV2")]
         [ProducesResponseType(200, Type = typeof(BlogPost))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -67,7 +67,7 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
 
             await _postRepository.AddAsync(post);
 
-            return CreatedAtRoute("GetBlogPost", new { id = post.Id }, post);
+            return CreatedAtRoute("GetBlogPostV2", new { id = post.Id }, post);
         }
 
         // PUT api/blogposts/5
