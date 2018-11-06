@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Nip.Blog.Services.Posts.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Swagger;
+using Nip.Blog.Services.Posts.API.Models;
 
 namespace Nip.Blog.Services.Posts.Api
 {
@@ -30,9 +31,27 @@ namespace Nip.Blog.Services.Posts.Api
         public void ConfigureServices(IServiceCollection services)
         {
             _logger.LogInformation("Configuring services");
+            String connection;
+            var dbType = "sqlite";
 
             services.AddMvc();
-            services.AddDbContext<BlogPostContext>(opt => opt.UseInMemoryDatabase("BlogPosts"));
+
+            switch (dbType) {
+                case "mssql":
+                    connection = @"Server=(localdb)\mssqllocaldb;Database=BlogPostsDb;Trusted_Connection=True;ConnectRetryCount=0";
+                    services.AddDbContextPool<BlogPostContext>(options => options.UseSqlServer(connection));
+                    break;
+
+                case "sqlite":
+                    connection = @"Data Source=Data/Posts.db";
+                    services.AddDbContextPool<BlogPostContext>(opt => opt.UseSqlite(connection));
+                    break;
+
+                default:
+                    services.AddDbContext<BlogPostContext>(opt => opt.UseInMemoryDatabase("BlogPosts"));
+                    break;
+            }
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info {
@@ -47,12 +66,25 @@ namespace Nip.Blog.Services.Posts.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, BlogPostContext context)
         {
             if (env.IsDevelopment())
             {
                 _logger.LogInformation("App is in development environment");
                 app.UseDeveloperExceptionPage();
+
+                context.Database.EnsureCreated();
+                if (!context.BlogPosts.Any())
+                {
+                    var posts = new List<BlogPost>
+                    {
+                        new BlogPost{Id = 1, Title = "Blog Post #1", Description = "Lorem ipsum..."},
+                        new BlogPost{Id = 2, Title = "Blog Post #2", Description = "Lorem ipsum..."},
+                        new BlogPost{Id = 3, Title = "Blog Post #3", Description = "Lorem ipsum..."},
+                    };
+                    context.BlogPosts.AddRange(posts);
+                    context.SaveChanges();
+                }
             } else
             {
                 _logger.LogInformation("App is in production environment");
