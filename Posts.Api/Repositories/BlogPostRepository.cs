@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Nip.Blog.Services.Posts.API.Data;
 using Nip.Blog.Services.Posts.API.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System;
 
 namespace Nip.Blog.Services.Posts.Api.Repositories
 {
@@ -21,10 +23,16 @@ namespace Nip.Blog.Services.Posts.Api.Repositories
             return _postsDbContext.BlogPosts.ToAsyncEnumerable();
         }
 
-        public async Task<PaginatedItems<BlogPost>> GetAllPagedAsync(int pageIndex, int pageSize)
+        public async Task<PaginatedItems<BlogPost>> GetAllPagedAsync(int pageIndex, int pageSize, Expression<Func<BlogPost, bool>> filter = null)
         {
-            var totalItems = await _postsDbContext.BlogPosts.CountAsync();
-            var items = await _postsDbContext.BlogPosts.OrderByDescending(c => c.Id).Skip(pageIndex * pageSize).Take(pageSize).ToListAsync();
+            IQueryable<BlogPost> query = _postsDbContext.BlogPosts;
+            if (filter != null) {
+                query = query.Where(filter);
+            }
+            var totalItems = await query.CountAsync();
+            var posts = query.OrderByDescending(c => c.Id).Skip(pageIndex * pageSize).Take(pageSize);
+
+            var items = await posts.ToListAsync();
 
             return new PaginatedItems<BlogPost>
             {

@@ -45,6 +45,18 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
             }
         }
 
+        // GET api/blogposts/withtitle/test
+        [HttpGet("withtitle/{title:minlength(1)}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(200, Type = typeof(PaginatedItems<BlogPost>))]
+        public async Task<IActionResult> Get(string title, [FromQuery]int pageIndex = 0, [FromQuery]int pageSize = 5)
+        {
+            _logger.LogInformation("Retrieving all posts with title {0}", title);
+
+            var posts = await _postRepository.GetAllPagedAsync(pageIndex, pageSize, x => x.Title.Contains(title));
+            return Ok(posts);
+        }
+
         // GET api/blogposts/5
         [HttpGet("{id}", Name = "GetBlogPostV2")]
         [ProducesResponseType(200, Type = typeof(BlogPost))]
