@@ -7,6 +7,7 @@ using Nip.Blog.Services.Posts.API.Data;
 using Nip.Blog.Services.Posts.API.Models;
 using Microsoft.Extensions.Logging;
 using Nip.Blog.Services.Posts.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Nip.Blog.Services.Posts.Api.Controllers
 {
@@ -98,6 +99,7 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
         public async Task<IActionResult> Put(long id, [FromBody] BlogPost updatedPost)
         {
             _logger.LogInformation("Updating post {0}", id);
@@ -113,7 +115,13 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
             {
                 post.Title = updatedPost.Title;
                 post.Description = updatedPost.Description;
-                await _postRepository.UpdateAsync(post);
+                try
+                {
+                    await _postRepository.UpdateAsync(post);
+                } catch (DbUpdateConcurrencyException e)
+                {
+                    return Conflict(e);
+                }
 
                 _logger.LogInformation("Post {0} updated successfully", id);
                 return NoContent();

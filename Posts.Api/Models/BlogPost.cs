@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace Nip.Blog.Services.Posts.API.Models
@@ -19,5 +20,9 @@ namespace Nip.Blog.Services.Posts.API.Models
         public string Description { get; set; }
 
         public ICollection<BlogPostComment> Comments { get; set; }
+
+        [Timestamp]
+        [IgnoreDataMember]
+        public byte[] RowVersion { get; set; }
     }
 }
