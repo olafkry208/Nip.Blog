@@ -34,22 +34,25 @@ namespace Nip.Blog.Services.Posts.Api
         {
             _logger.LogInformation("Configuring services");
             String connection;
-            var dbType = "sqlite";
+            var dbType = Configuration.GetValue<string>("SelectedDbType");
 
             services.AddMvc();
 
             switch (dbType) {
-                case "mssql":
-                    connection = @"Server=(localdb)\mssqllocaldb;Database=BlogPostsDb;Trusted_Connection=True;ConnectRetryCount=0";
+                case "MsSQL":
+                    _logger.LogInformation("Connecting to MsSQL database");
+                    connection = Configuration.GetConnectionString("MsSQLBlogPostsDatabase");
                     services.AddDbContextPool<BlogPostContext>(options => options.UseSqlServer(connection));
                     break;
 
-                case "sqlite":
-                    connection = @"Data Source=Data/Posts.db";
+                case "SQLite":
+                    _logger.LogInformation("Connecting to SQLite database");
+                    connection = Configuration.GetConnectionString("SQLiteBlogPostsDatabase");
                     services.AddDbContextPool<BlogPostContext>(opt => opt.UseSqlite(connection));
                     break;
 
                 default:
+                    _logger.LogInformation("Initializing in-memory database");
                     services.AddDbContext<BlogPostContext>(opt => opt.UseInMemoryDatabase("BlogPosts"));
                     break;
             }

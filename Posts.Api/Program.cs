@@ -25,6 +25,11 @@ namespace Nip.Blog.Services.Posts.Api
                     logging.ClearProviders();
                     logging.AddConsole();
                 })
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.SetBasePath(Directory.GetCurrentDirectory());
+                    config.AddJsonFile("dbsettings.json", optional: false, reloadOnChange: true);
+                })
                 .Build();
     }
 }
