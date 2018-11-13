@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nip.Blog.Services.Posts.API.Data;
 using Nip.Blog.Services.Posts.API.Models;
-using Microsoft.Extensions.Logging;
 using Nip.Blog.Services.Posts.Api.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Nip.Blog.Services.Posts.Api.Controllers
 {
@@ -15,10 +15,10 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
     [Route("api/v{version:apiVersion}/BlogPosts")]
     public class BlogPostsV2Controller : Controller
     {
-        private readonly ILogger<BlogPostsController> _logger;
+        private readonly ILogger<BlogPostsV2Controller> _logger;
         private readonly IBlogPostRepository _postRepository;
 
-        public BlogPostsV2Controller(ILogger<BlogPostsController> logger, IBlogPostRepository postRepository)
+        public BlogPostsV2Controller(ILogger<BlogPostsV2Controller> logger, IBlogPostRepository postRepository)
         {
             _logger = logger;
             _postRepository = postRepository;

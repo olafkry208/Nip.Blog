@@ -19,7 +19,7 @@
     "Posts.Api": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/v1/blogPosts",
+      "launchUrl": "api/v2/blogPosts",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
