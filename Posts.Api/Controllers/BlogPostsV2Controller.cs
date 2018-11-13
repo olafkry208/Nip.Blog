@@ -143,5 +143,47 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
                 return NoContent();
             }
         }
+
+        [HttpGet("{id}/comments", Name = "GetBlogPostComments")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<BlogPostComment>))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<IEnumerable<BlogPostComment>>> GetAllComments(long id) {
+            _logger.LogInformation("Retrieving comments for post {0}", id);
+
+            var post = await _postRepository.GetAsync(id);
+            if (post == null)
+            {
+                _logger.LogWarning("Post {0} not found", id);
+                return NotFound();
+            }
+            else
+            {
+                var items = await _postRepository.GetCommentsAsync(id);
+                _logger.LogInformation("Comments for post {0} retrieved successfully", id);
+                return Ok(items);
+            }
+        }
+        
+        [HttpPost("{id}/comments")]
+        [ProducesResponseType(201, Type = typeof(BlogPostComment))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> PostComment(long id, [FromBody] BlogPostComment comment) {
+            _logger.LogInformation("Creating new comment for post {0}", id);
+            _logger.LogDebug("Received comment with author: {1}'", comment.Author);
+
+            var post = await _postRepository.GetAsync(id);
+            if (post == null)
+            {
+                _logger.LogWarning("Post {0} not found", id);
+                return NotFound();
+            }
+            else
+            {
+                await _postRepository.AddCommentAsync(id, comment);
+                return CreatedAtRoute("GetBlogPostComments", new { id = comment.Id }, comment);
+            }
+        }
     }
 }

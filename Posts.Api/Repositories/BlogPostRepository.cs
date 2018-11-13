@@ -66,5 +66,21 @@ namespace Nip.Blog.Services.Posts.Api.Repositories
             _postsDbContext.BlogPosts.Remove(post);
             await _postsDbContext.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<BlogPostComment>> GetCommentsAsync(long blogPostId)
+        {
+            var post = await _postsDbContext.BlogPosts.Include(x => x.Comments).Where(x => x.Id == blogPostId).FirstAsync();
+            return post.Comments;
+        }
+
+        public async Task AddCommentAsync(long blogPostId, BlogPostComment comment)
+        {
+            var post = await _postsDbContext.BlogPosts.Include(x => x.Comments).Where(x => x.Id == blogPostId).FirstAsync();
+            if (post != null)
+            {
+                post.Comments.Add(comment);
+                await this.UpdateAsync(post);
+            }
+        }
     }
 }
