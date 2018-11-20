@@ -82,5 +82,25 @@ namespace Nip.Blog.Services.Posts.Api.Repositories
                 await this.UpdateAsync(post);
             }
         }
+
+        public async Task<BlogPostComment> GetCommentAsync(long blogPostId, long commentId)
+        {
+            var post = await _postsDbContext.BlogPosts.Include(x => x.Comments).Where(x => x.Id == blogPostId).FirstAsync();
+            if (post != null)
+            {
+                return post.Comments.Where(x => x.Id == commentId).First();
+            }
+            return null;
+        }
+        
+        public async Task DeleteCommentAsync(long blogPostId, long commentId)
+        {
+            BlogPostComment comment = await this.GetCommentAsync(blogPostId, commentId);
+            if (comment != null) {
+                BlogPost post = await this.GetAsync(blogPostId);
+                post.Comments.Remove(comment);
+                await this.UpdateAsync(post);
+            }
+        }
     }
 }

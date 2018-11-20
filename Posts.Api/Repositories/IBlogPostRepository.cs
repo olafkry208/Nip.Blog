@@ -17,6 +17,8 @@ namespace Nip.Blog.Services.Posts.Api.Repositories
         Task DeleteAsync(long id);
 
         Task<IEnumerable<BlogPostComment>> GetCommentsAsync(long blogPostId);
+        Task<BlogPostComment> GetCommentAsync(long blogPostId, long commentId);
         Task AddCommentAsync(long blogPostId, BlogPostComment comment);
+        Task DeleteCommentAsync(long blogPostId, long commentId);
     }
 }

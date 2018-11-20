@@ -193,5 +193,37 @@ namespace Nip.Blog.Services.Posts.Api.Controllers
                 return CreatedAtRoute("GetBlogPostComments", new { id = comment.Id }, comment);
             }
         }
+        
+        [HttpDelete("{blogPostId}/comments/{commentId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DeleteComment(long blogPostId, long commentId)
+        {
+            _logger.LogInformation("Deleting comment {0} for post {1}", commentId, blogPostId);
+
+            var post = await _postRepository.GetAsync(blogPostId);
+            if (post == null)
+            {
+                _logger.LogWarning("Post {0} not found", blogPostId);
+                return NotFound();
+            }
+            else
+            {
+                var comment = await _postRepository.GetCommentAsync(blogPostId, commentId);
+                if (post == null)
+                {
+                    _logger.LogWarning("Comment {0} not found", commentId);
+                    return NotFound();
+                }
+                else
+                {
+                    await _postRepository.DeleteCommentAsync(blogPostId, commentId);
+
+                    _logger.LogInformation("Comment {0} deleted successfully", commentId);
+                    return NoContent();
+                }
+            }
+        }
     }
 }
