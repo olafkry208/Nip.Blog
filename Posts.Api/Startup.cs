@@ -36,6 +36,16 @@ namespace Nip.Blog.Services.Posts.Api
             String connection;
             var dbType = Configuration.GetValue<string>("SelectedDbType");
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder => {
+                    builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                });
+            });
             services.AddMvc();
 
             switch (dbType) {
@@ -106,6 +116,7 @@ namespace Nip.Blog.Services.Posts.Api
                 app.UseExceptionHandler("/api/v1/Error");
             }
 
+            app.UseCors("AllowAll");
             app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
