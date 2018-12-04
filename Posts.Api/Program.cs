@@ -17,7 +17,7 @@ namespace Nip.Blog.Services.Posts.Api
             BuildWebHost(args).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .ConfigureLogging(logging =>
@@ -29,7 +29,10 @@ namespace Nip.Blog.Services.Posts.Api
                 {
                     config.SetBasePath(Directory.GetCurrentDirectory());
                     config.AddJsonFile("dbsettings.json", optional: false, reloadOnChange: true);
-                })
+                });
+
+        public static IWebHost BuildWebHost(string[] args) =>
+            CreateWebHostBuilder(args)
                 .Build();
     }
 }
